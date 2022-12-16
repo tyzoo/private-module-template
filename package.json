@@ -1,6 +1,6 @@
 {
   "name": "@tyzoo/private-module-template",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "A boilerplate for creating a private npm package, including Typescript support and Github Actions for building, deploying, and publishing. Also features automatic patch version increments.",
   "main": "dist/index.js",
   "scripts": {
