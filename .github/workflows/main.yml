@@ -1,0 +1,49 @@
+name: Zootools Private Node.js Package Publish
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  publish-gpr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Node and NPM
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: npm
+          registry-url: 'https://npm.pkg.github.com/'
+          scope: '@${{ env.GH_USERNAME }}'
+        env:
+          GITHUB_EMAIL: ${{ secrets.GH_EMAIL }}
+      - name: Configure git
+        run: |
+          git config user.email "${{ env.GH_EMAIL }}"
+          git config user.name "${{ env.GH_USERNAME }}"
+        env:
+          GITHUB_EMAIL: ${{ secrets.GH_EMAIL }}
+          GITHUB_USERNAME: ${{ secrets.GH_USERNAME }}
+      - name: Yarn install dependencies
+        uses: borales/actions-yarn@v4
+        with:
+          cmd: install --frozen-lockfile
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.TOKEN}}
+      - name: Yarn build
+        uses: borales/actions-yarn@v4
+        with:
+          cmd: build
+      - name:  'Automated Version Bump'
+        uses:  'phips28/gh-action-bump-version@master'
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+        with:
+          default: patch
+      - name: Publish NPM Package
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.TOKEN}}
